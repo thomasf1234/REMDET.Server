@@ -1,0 +1,43 @@
+---
+version: '3.4'
+services:
+  remdet:
+    container_name: remdet
+    hostname: remdet
+    build: .
+    restart: unless-stopped
+    ports:
+      - 7000:80
+    env_file:
+      - docker/development.env
+    volumes:
+      - type: bind
+        source: ./docker/function.json
+        target: /home/site/wwwroot/Measurements/function.json
+        read_only: true
+  influxdb:
+    container_name: influxdb
+    hostname: influxdb
+    network_mode: host
+    image: quay.io/influxdb/influxdb:2.0.0-beta
+    restart: unless-stopped
+    command: --reporting-disabled
+    ports:
+      - 9999:9999
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+  grafana:
+    container_name: grafana
+    hostname: grafana
+    network_mode: host
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  influxdb-data:
+  grafana-data:
+
